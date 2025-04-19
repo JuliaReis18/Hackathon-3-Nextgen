@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE
+html >
+  <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,11 +19,19 @@
         
         .app-container {
             background-color: #1a1a1a;
-            width: 320px;
-            border-radius: 20px;
+            width: 400px;
+            min-height: 650px;
+            border-radius: 28px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             color: #ffffff;
+        }
+        @media (max-width: 500px) {
+            .app-container {
+                width: 98vw;
+                min-height: 98vh;
+                border-radius: 0;
+            }
         }
         
         .header {
@@ -109,25 +118,81 @@
             margin: 5px 0 0;
         }
         
+        .progress-section {
+            margin: 25px 0 15px;
+            position: relative;
+        }
+        
         .progress-container {
             background-color: #333333;
-            height: 8px;
-            border-radius: 4px;
-            margin: 20px 0;
+            height: 20px;
+            border-radius: 10px;
             overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
         }
         
         .progress-bar {
-            background-color: #ffffff;
+            background: linear-gradient(90deg, #4c6baf 0%, #5e8eff 100%);
             height: 100%;
-            width: 70%;
-            border-radius: 4px;
+            border-radius: 10px;
+            position: relative;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 0 10px rgba(94, 142, 255, 0.5);
+        }
+        
+        .progress-percentage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 51%,
+                rgba(255, 255, 255, 0) 100%
+            );
+        }
+        
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 12px;
+            color: #999999;
         }
         
         .level-text {
             font-size: 18px;
             font-weight: bold;
             margin: 15px 0;
+        }
+        
+        .xp-next-text {
+            font-size: 14px;
+            color: #cccccc;
+            margin: 10px 0 15px;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            display: inline-block;
         }
         
         .nav-bar {
@@ -156,6 +221,58 @@
             font-size: 18px;
             margin: 50px 0;
             text-align: center;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px rgba(94, 142, 255, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(94, 142, 255, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(94, 142, 255, 0.5); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        .progress-markers {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            height: 20px;
+            margin-top: 10px;
+        }
+
+        .marker {
+            position: relative;
+            width: 3px;
+            height: 10px;
+            background-color: #333333;
+        }
+
+        .marker.completed {
+            background-color: #5e8eff;
+        }
+
+        .marker.current {
+            background-color: #5e8eff;
+            height: 15px;
+            width: 5px;
+            box-shadow: 0 0 10px rgba(94, 142, 255, 0.8);
+        }
+
+        .marker-label {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #999999;
+        }
+
+        .xp-progress-visual {
+            background-color: #222222;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -210,7 +327,22 @@
                     }
                     
                     const player = await response.json();
-                    renderPlayerProfile(player);
+
+                    const statusResponse = await fetch('https://service2.funifier.com/v3/player/' + player._id + '/status', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': token,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!statusResponse.ok) {
+                        throw new Error('Erro ao buscar status do jogador');
+                    }
+                    
+                    const status = await statusResponse.json();
+                    
+                    renderPlayerProfile(player, status);
                 } catch (error) {
                     console.error(error);
                     // Em caso de erro, redirecionar para login
@@ -218,23 +350,61 @@
                     window.location.href = 'login.html';
                 }
             }
+
+            function generateProgressMarkers(currentLevel, nextLevel, currentXp) {
+                const totalMarkers = 10;
+                const xpRange = nextLevel - currentLevel;
+                let markersHTML = '';
+                
+                for (let i = 0; i <= totalMarkers; i++) {
+                    const markerXp = currentLevel + (xpRange * (i / totalMarkers));
+                    const isCompleted = currentXp >= markerXp;
+                    const isCurrent = i > 0 && 
+                                      currentXp >= currentLevel + (xpRange * ((i-1) / totalMarkers)) && 
+                                      currentXp < markerXp;
+                    
+                    const markerClass = isCurrent ? 'marker current' : isCompleted ? 'marker completed' : 'marker';
+                    const showLabel = i === 0 || i === totalMarkers || i === Math.floor(totalMarkers/2) || isCurrent;
+                    
+                    markersHTML += `
+                        <div class="${markerClass}">
+                            ${showLabel ? `<span class="marker-label">${Math.round(markerXp)}</span>` : ''}
+                        </div>
+                    `;
+                }
+                
+                return markersHTML;
+            }
             
-            function renderPlayerProfile(player) {
+            function renderPlayerProfile(player, status) {
                 loading.style.display = 'none';
 
                 // Pegando os dados corretamente com base na resposta da API
-                const moedas = player.pointCategories?.moedas ?? 0;
-                const xp = player.pointCategories?.xp ?? 0;
-                const totalPoints = player.totalPoints ?? 0;
-                const nivel = player.level?.level ?? 'Nível desconhecido';
-                const percent = player.level_progress?.percent_completed ?? 0;
-
-                // Formatar moedas, xp e pontos totais
+                const moedas = status.point_categories?.moedas ?? 0;
+                const xp = status.point_categories?.xp ?? 0;
+                const currentLevel = status.level_progress?.level?.minPoints ?? 0;
+                const nextLevel = status.level_progress?.next_level?.minPoints ?? 0;
+                
+                // Calcular XP necessário para o próximo nível
+                const xpToNext = nextLevel - xp;
+                
+                // Calcular a porcentagem de progresso para o próximo nível
+                const xpRange = nextLevel - currentLevel;
+                const xpProgress = xp - currentLevel;
+                let percentComplete = 0;
+                
+                if (xpRange > 0) {
+                    percentComplete = Math.min(100, Math.max(0, (xpProgress / xpRange) * 100));
+                }
+                
+                // Formatar moedas e xp
                 const moedasFmt = new Intl.NumberFormat('pt-BR').format(moedas);
                 const xpFmt = new Intl.NumberFormat('pt-BR').format(xp);
-                const totalPointsFmt = new Intl.NumberFormat('pt-BR').format(totalPoints);
-
-                const progressBarStyle = `width: ${percent}%;`;
+                const nivelAtual = status.level_progress?.level?.level ?? 'Nível desconhecido';
+                const proximoNivel = status.level_progress?.next_level?.level ?? '';
+                
+                // Formatar porcentagem para exibição
+                const percentFormatted = percentComplete.toFixed(0);
 
                 const profileHTML = `
                     <div class="profile-image-container">
@@ -242,10 +412,6 @@
                     </div>
                     <div class="player-name">${player.name || 'Jogador'}</div>
                     <div class="points-container">
-                        <div class="points-box">
-                            <p class="points-value">${totalPointsFmt}</p>
-                            <p class="points-label">Pontos</p>
-                        </div>
                         <div class="points-box">
                             <p class="points-value">${moedasFmt}</p>
                             <p class="points-label">Moedas</p>
@@ -255,10 +421,42 @@
                             <p class="points-label">XP</p>
                         </div>
                     </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="${progressBarStyle}"></div>
+                    
+                    <div class="progress-section">
+                        <div class="level-info">
+                            <span>${nivelAtual}</span>
+                            <span>${proximoNivel}</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar pulse-animation" style="width: ${percentComplete}%"></div>
+                            <div class="progress-percentage">${percentFormatted}%</div>
+                        </div>
+                        <div class="level-info">
+                            <span>${currentLevel} XP</span>
+                            <span>${nextLevel} XP</span>
+                        </div>
+                        
+                        <!-- Barra de progresso visual com marcadores -->
+                        <div class="xp-progress-visual" style="margin-top: 15px; position: relative; height: 30px;">
+                            <!-- Marcadores de progresso -->
+                            <div class="progress-markers">
+                                ${generateProgressMarkers(currentLevel, nextLevel, xp)}
+                            </div>
+                            <!-- Texto informativo -->
+                            <div class="progress-text" style="text-align: center; margin-top: 5px; font-size: 12px; color: #cccccc;">
+                                ${xpProgress} de ${xpRange} XP conquistados neste nível
+                            </div>
+                        </div>
                     </div>
-                    <div class="level-text">${nivel}</div>
+                    
+                    <div class="xp-next-text">
+                        Faltam <b>${new Intl.NumberFormat('pt-BR').format(xpToNext)}</b> XP para o próximo nível
+                        <div style="font-size: 11px; margin-top: 5px; color: #999999;">
+                            ${percentFormatted}% do caminho concluído
+                        </div>
+                    </div>
+                    
+                    <div class="level-text">${nivelAtual}</div>
                     <div class="nav-bar">
                         <a href="#" class="nav-item">
                             <div class="nav-icon">&#9737;</div>
@@ -275,6 +473,14 @@
                     </div>
                 `;
                 playerContainer.innerHTML = profileHTML;
+                
+                // Iniciar animação da barra de progresso com delay para criar efeito visual
+                setTimeout(() => {
+                    const progressBar = document.querySelector('.progress-bar');
+                    if (progressBar) {
+                        progressBar.style.width = `${percentComplete}%`;
+                    }
+                }, 300);
             }
         });
     </script>
