@@ -9,9 +9,9 @@
 [Literal Café no Instagram](https://www.instagram.com/literalcafe)  
 O Literal Café é mais do que uma cafeteria: é um espaço onde o café especial encontra a cultura. Localizado em um ambiente acolhedor e inspirador, o Literal oferece:
 
-- Cafés especiais, pães e bolos artesanais
-- Espaço para leitura e eventos
-- Coworking criativo e colaborativo
+- Cafés especiais, pães e bolos artesanais;
+- Espaço para leitura e eventos;
+- Coworking criativo e colaborativo.
 
 🎯 **Público-alvo:** estudantes, profissionais autônomos e amantes de café de 20 a 40 anos.
 
@@ -69,9 +69,14 @@ Desenvolver um **aplicativo web** onde os clientes possam:
 ---
 
 ### 🎯 **Desafios**
-- Desafio principal:
-  - _“A cada R$1 em compras = 1 moeda”_  
-    _(ações cadastradas manualmente pelo gestor via Funifier Studio)_
+- "Comprou, ganhou!" - Desafio se baseia em que a cada R$1 em compras, você ganha 1 moeda na plataforma. Além de ganhar 10 pontos XPs.
+
+- Faça 500 reais em compras. - Desafio se baseia em acumular 500 reais em compras e receba 250 XPs.
+
+- Faça 4 compras dentro de um mês. - Desafio se baseia em fazer 4 compras no período de um mês e ganhe 100 XPs.
+
+- Compartilhe no Instagram. -  Desafio se baseia em postar um story e ganhe 10 XPs.
+    
 
 ---
 
