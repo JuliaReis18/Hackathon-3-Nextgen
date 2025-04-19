@@ -182,22 +182,22 @@
         </div>
 
         <div class="navbar">
-            <a href="#" class="nav-item">
-                <div class="nav-icon">📊</div>
-                <span>Status</span>
-            </a>
-            <a href="#" class="nav-item active">
-                <div class="nav-icon">🏆</div>
-                <span>Ranking</span>
-            </a>
-            <a href="#" class="nav-item">
-                <div class="nav-icon">🎯</div>
-                <span>Desafios</span>
-            </a>
-            <a href="#" class="nav-item">
-                <div class="nav-icon">🎁</div>
-                <span>Prêmios</span>
-            </a>
+            <div class="nav-item" ng-class="{'active': currentPage === 'status.html'}" ng-click="navigateTo('status.html')">
+                <span class="nav-icon">📊</span>
+                Status
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'challenges.html'}" ng-click="navigateTo('challenges.html')">
+                <span class="nav-icon">🎯</span>
+                Desafios
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'leaderboard.html'}" ng-click="navigateTo('leaderboard.html')">
+                <span class="nav-icon">🏆</span>
+                Ranking
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'prizes.html'}" ng-click="navigateTo('prizes.html')">
+                <span class="nav-icon">🎁</span>
+                Prêmios
+            </div>
         </div>
     </div>
 
@@ -208,6 +208,14 @@
                 $scope.loading = true;
                 $scope.error = false;
                 
+                // Define a página atual com base no caminho do URL
+                $scope.currentPage = window.location.pathname.split('/').pop();
+
+                // Função para navegação
+                $scope.navigateTo = function(page) {
+                    window.location.href = page;
+                };
+
                 var req = {
                     method: 'POST',
                     url: 'https://service2.funifier.com/v3/leaderboard/ESZsmkK/leader/aggregate?period=&live=true',
