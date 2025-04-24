@@ -68,86 +68,19 @@
             text-align: center;
         }
 
-        /* Container da imagem de perfil com posicionamento relativo */
-        .profile-image-wrapper {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
-        }
-
         .profile-image-container {
             width: 100px;
             height: 100px;
+            margin: 0 auto 15px;
             border-radius: 50%;
             overflow: hidden;
             background-color: #333333;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .profile-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        /* Botão de edição de perfil reposicionado */
-        .edit-profile-button {
-            position: absolute;
-            right: -10px;
-            bottom: -5px;
-            background: linear-gradient(135deg, #00000082 0%, #00000000 100%);
-            color: #ffffff;
-            border: 2px solid #121212;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .edit-profile-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(94, 142, 255, 0.6);
-        }
-
-        .edit-profile-button:active {
-            transform: scale(0.95);
-        }
-
-        /* Tooltip para o botão de edição */
-        .edit-profile-button::after {
-            content: "Editar perfil";
-            position: absolute;
-            right: 0;
-            bottom: 46px;
-            background-color: rgba(30, 30, 30, 0.9);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .edit-profile-button:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Ícone de lápis estilizado */
-        .edit-icon {
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .player-name {
@@ -353,12 +286,6 @@
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 10px;
-            transition: transform 0.2s ease;
-        }
-        
-        .challenge-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         .challenge-title {
@@ -376,8 +303,7 @@
         
         .challenge-progress-fill {
             height: 100%;
-            background-color: #5e8eff;
-            border-radius: 3px;
+            background-color: #ffffff;
         }
         
         .challenge-stats {
@@ -407,18 +333,9 @@
             <div class="error" ng-if="error">{{ errorMessage }}</div>
             
             <div ng-if="!loading && !error">
-                <!-- Adicionado wrapper para posicionamento do botão fora da imagem -->
-                <div class="profile-image-wrapper">
-                    <div class="profile-image-container">
-                        <img class="profile-image" ng-src="{{ player.image.small.url || 'https://via.placeholder.com/100' }}" alt="Foto de Perfil">
-                    </div>
-                    
-                    <!-- Botão de edição de perfil reposicionado -->
-                    <button class="edit-profile-button" ng-click="navigateTo('edit_profile.html')">
-                        <span class="edit-icon">✏️</span>
-                    </button>
+                <div class="profile-image-container">
+                    <img class="profile-image" ng-src="{{ player.image.small.url || 'https://via.placeholder.com/100' }}" alt="Foto de Perfil">
                 </div>
-                
                 <div class="player-name">{{ player.name || 'Jogador' }}</div>
                 <div class="points-container">
                     <div class="points-box">
@@ -443,9 +360,10 @@
                     </div>
                 </div>
 
-                <!-- Texto informativo -->
-                <div class="progress-text" style="text-align: center; margin-top: 5px; font-size: 12px; color: #cccccc;">
-                    {{xpProgress}} de {{xpRange}} XP conquistados neste nível
+                    <!-- Texto informativo -->
+                    <div class="progress-text" style="text-align: center; margin-top: 5px; font-size: 12px; color: #cccccc;">
+                        {{xpProgress}} de {{xpRange}} XP conquistados neste nível
+                    </div>
                 </div>
 
                 <div class="level-text">{{ player.level.level || 'Nível desconhecido' }}</div>

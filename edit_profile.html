@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-br" ng-app="literalCafeApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - Literal Café</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #121212;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-bottom: 70px;
+        }
+
+        header {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 15px;
+            position: relative;
+            text-align: center;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0;
+            display: inline-block;
+        }
+
+        .logo-box {
+            display: inline-block;
+            border: 2px solid #fff;
+            padding: 5px 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .profile-container {
+            padding: 20px;
+        }
+
+        .profile-image-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #333333;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .change-photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background-color: #333333;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: 2px solid #5e8eff;
+        }
+
+        .submit-button {
+            background: linear-gradient(90deg, #4c6baf 0%, #5e8eff 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .submit-button:disabled {
+            background: #444444;
+            color: #999999;
+            cursor: not-allowed;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #1e1e1e;
+            padding: 12px;
+            border-radius: 12px 12px 0 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 480px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #777;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 5px solid #333333;
+            border-top: 5px solid #5e8eff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background-color: rgba(0, 255, 0, 0.1);
+            color: #4caf50;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body ng-controller="ProfileController">
+    <div class="app-container">
+        <header>
+            <button class="back-button" ng-click="navigateBack()">&#10094;</button>
+            <div class="logo-box">//</div> <br>
+            <h1 class="logo"> Editar Perfil</h1>
+        </header>
+
+        <div class="profile-container">
+            <div class="success-message" ng-if="updateSuccess">
+                Perfil atualizado com sucesso!
+            </div>
+
+            <div class="error-message" ng-if="updateError">
+                {{ errorMessage }}
+            </div>
+
+            <!-- Foto de perfil -->
+            <div class="profile-image-container">
+                <img class="profile-image" ng-src="{{ profileImage || 'https://via.placeholder.com/100' }}" alt="Foto de Perfil">
+                <div class="change-photo-overlay">Alterar foto</div>
+            </div>
+
+            <!-- Formulário de edição -->
+            <form name="profileForm" ng-submit="updateProfile()">
+                <div class="form-group">
+                    <label class="form-label" for="name">Nome</label>
+                    <input type="text" id="name" class="form-input" ng-model="user.name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-input" ng-model="user.email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Telefone</label>
+                    <input type="tel" id="phone" class="form-input" ng-model="user.extra.telefone">
+                </div>
+
+                <button type="submit" class="submit-button" ng-disabled="profileForm.$invalid || isUpdating">
+                    {{ isUpdating ? 'Salvando...' : 'Salvar Alterações' }}
+                </button>
+            </form>
+        </div>
+
+        <div class="navbar">
+            <div class="nav-item" ng-class="{'active': currentPage === 'status.html'}" ng-click="navigateTo('status.html')">
+                <span class="nav-icon">📊</span>
+                Status
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'challenges.html'}" ng-click="navigateTo('challenges.html')">
+                <span class="nav-icon">🎯</span>
+                Desafios
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'leaderboard.html'}" ng-click="navigateTo('leaderboard.html')">
+                <span class="nav-icon">🏆</span>
+                Ranking
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'prizes.html'}" ng-click="navigateTo('prizes.html')">
+                <span class="nav-icon">🎁</span>
+                Prêmios
+            </div>
+        </div>
+
+        <!-- Loading overlay -->
+        <div class="loading-overlay" ng-if="isUpdating">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('literalCafeApp', []);
+        
+        app.controller('ProfileController', function($scope, $http, $timeout) {
+            // Define a página atual com base no caminho do URL
+            $scope.currentPage = window.location.pathname.split('/').pop();
+            
+            // Inicialização de variáveis
+            $scope.user = {
+                name: '',
+                email: '',
+                _id: '',
+                extra: {
+                    telefone: ''
+                }
+            };
+            $scope.isUpdating = false;
+            $scope.updateSuccess = false;
+            $scope.updateError = false;
+            $scope.errorMessage = '';
+            $scope.profileImage = 'https://via.placeholder.com/100';
+            
+            // Verificar se existe um token
+            const token = localStorage.getItem('funifier_token');
+            if (!token) {
+                // Redirecionar para a página de login
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Função para navegação
+            $scope.navigateTo = function(page) {
+                window.location.href = page;
+            };
+            
+            // Função para voltar
+            $scope.navigateBack = function() {
+                window.history.back();
+            };
+            
+            // Função para carregar os dados do usuário
+            function loadUserData() {
+                $scope.isUpdating = true;
+                
+                // Na implementação real, você buscaria os dados do usuário atual
+                // Aqui estamos usando dados simulados
+                $http({
+                    method: 'GET',
+                    url: 'https://service2.funifier.com/v3/player/david',
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function(response) {
+                    $scope.user = response.data;
+                    
+                    // Garantir que a estrutura extra existe
+                    if (!$scope.user.extra) {
+                        $scope.user.extra = {};
+                    }
+                    if (!$scope.user.extra.telefone) {
+                        $scope.user.extra.telefone = '';
+                    }
+                    
+                    // Tentar carregar a imagem do perfil se disponível
+                    if ($scope.user.image && $scope.user.image.medium && $scope.user.image.medium.url) {
+                        $scope.profileImage = $scope.user.image.medium.url;
+                    }
+                    
+                    $scope.isUpdating = false;
+                }, function(error) {
+                    console.error('Erro ao buscar dados do usuário:', error);
+                    $scope.updateError = true;
+                    $scope.errorMessage = 'Erro ao carregar dados do usuário. Por favor, tente novamente.';
+                    $scope.isUpdating = false;
+                    
+                    // Em caso de erro de autenticação, redireciona para login
+                    if (error.status === 401) {
+                        localStorage.removeItem('funifier_token');
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+            
+            // Função para atualizar o perfil
+            $scope.updateProfile = function() {
+                $scope.isUpdating = true;
+                $scope.updateSuccess = false;
+                $scope.updateError = false;
+                
+                var req = {
+                    method: 'POST',
+                    url: 'https://service2.funifier.com/v3/player',
+                    headers: {
+                        "Authorization": token,
+                        "Content-Type": "application/json"
+                    },
+                    data: {
+                        "_id": $scope.user._id,
+                        "name": $scope.user.name,
+                        "email": $scope.user.email,
+                        "extra": {
+                            "telefone": $scope.user.extra.telefone
+                        }
+                    }
+                };
+                
+                $http(req).then(
+                    function(response) {
+                        console.log('Perfil atualizado:', response.data);
+                        $scope.isUpdating = false;
+                        $scope.updateSuccess = true;
+                        
+                        // Depois de 3 segundos, esconde a mensagem de sucesso
+                        $timeout(function() {
+                            $scope.updateSuccess = false;
+                        }, 3000);
+                    },
+                    function(error) {
+                        console.error('Erro ao atualizar perfil:', error);
+                        $scope.isUpdating = false;
+                        $scope.updateError = true;
+                        $scope.errorMessage = 'Erro ao atualizar o perfil. Por favor, tente novamente.';
+                    }
+                );
+            };
+            
+            // Carregar dados iniciais
+            loadUserData();
+        });
+    </script>
+</body>
+</html>

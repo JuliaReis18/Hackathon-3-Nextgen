@@ -14,16 +14,16 @@
         }
 
         body {
-            background-color: #f5f5f5;
-            color: #1e1e1e;
+            background-color: #121212;
+            color: #e0e0e0;
         }
 
         .app-container {
             max-width: 480px;
             margin: 0 auto;
-            background-color: #fff;
+            background-color: #1a1a1a;
             min-height: 100vh;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             padding-bottom: 70px; /* Adicione este espaço para o conteúdo não ficar sob a navbar */
         }
 
@@ -79,11 +79,24 @@
             font-weight: bold;
         }
 
+        .coin-image {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+
+        .coin-image-small {
+            width: 18px;
+            height: 18px;
+            margin-right: 3px;
+        }
+
         .section-title {
             padding: 15px;
             font-size: 16px;
             font-weight: 600;
-            background-color: #f1f1f1;
+            background-color: #222222;
+            color: #e0e0e0;
         }
 
         .product-list {
@@ -91,10 +104,10 @@
         }
 
         .product-card {
-            background-color: white;
+            background-color: #252525;
             border-radius: 8px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             display: flex;
             height: 120px;
@@ -121,7 +134,7 @@
         }
 
         .product-description {
-            color: #666;
+            color: #aaa;
             font-size: 12px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -143,9 +156,9 @@
         }
 
         .buy-button {
-            background-color: white;
-            color: #333;
-            border: 1px solid #333;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #444;
             border-radius: 4px;
             padding: 5px 12px;
             font-size: 12px;
@@ -155,9 +168,9 @@
         }
 
         .buy-button:disabled {
-            background-color: #f1f1f1;
-            color: #999;
-            border-color: #ccc;
+            background-color: #333;
+            color: #777;
+            border-color: #444;
             cursor: not-allowed;
         }
 
@@ -169,7 +182,7 @@
             display: flex;
             align-items: center;
             padding: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #333;
         }
 
         .saved-product-image {
@@ -234,8 +247,8 @@
         .error-message {
             text-align: center;
             padding: 20px;
-            color: #d32f2f;
-            background-color: #ffebee;
+            color: #ff6b6b;
+            background-color: #381c1c;
             border-radius: 4px;
             margin: 10px;
         }
@@ -254,12 +267,13 @@
         }
 
         .modal-content {
-            background-color: white;
+            background-color: #252525;
+            color: #e0e0e0;
             padding: 20px;
             border-radius: 8px;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         }
 
         .modal-title {
@@ -297,13 +311,13 @@
         }
 
         .modal-button-secondary {
-            background-color: #e0e0e0;
-            color: #333;
+            background-color: #333;
+            color: #ddd;
         }
 
         .success-message {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+            background-color: #1b3a1b;
+            color: #4caf50;
             padding: 10px;
             border-radius: 4px;
             margin-top: 10px;
@@ -342,7 +356,7 @@
         </header>
 
         <div class="wallet">
-            <span class="coin">&#9679;</span>
+            <img src="./assets/coin.png" alt="Moeda" class="coin-image">
             <span>{{userCoins}}</span>
         </div>
 
@@ -372,7 +386,7 @@
                         <p class="product-description">{{item.description}}</p>
                     </div>
                     <div class="product-price">
-                        <span class="price-coin">&#9679;</span>
+                        <img src="./assets/coin.png" alt="Moeda" class="coin-image-small">
                         <span>{{getPrice(item)}}</span>
                         <button class="buy-button" ng-click="confirmPurchase(item)" ng-disabled="userCoins < getPrice(item) || processingPurchase">COMPRAR</button>
                     </div>
@@ -440,7 +454,7 @@
 
             // Dados do usuário
             $scope.playerName = "david"; // Nome do jogador para a API
-            $scope.userCoins = 1350;      // Quantidade de moedas do jogador
+            $scope.userCoins = 200;      // Quantidade de moedas do jogador
             
             // Itens disponíveis da API
             $scope.availableItems = [];
