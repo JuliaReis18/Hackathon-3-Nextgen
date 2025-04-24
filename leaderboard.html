@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-br" ng-app="literalCafeApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking - Literal Café</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .ranking-item {
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .ranking-position {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .player-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 16px;
+            object-fit: cover;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .player-points {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .position-1 {
+            color: gold;
+        }
+
+        .position-2 {
+            color: silver;
+        }
+
+        .position-3 {
+            color: #cd7f32; /* bronze */
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #1e1e1e;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #777;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 18px;
+            color: #aaa;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 0, 0, 0.1);
+            border-radius: 12px;
+            color: #ff6b6b;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body ng-controller="RankingController">
+    <div class="container">
+        <div class="header">
+            <button class="back-button">←</button>
+            <h1 class="title">Ranking</h1>
+        </div>
+
+        <div class="loading" ng-if="loading">
+            Carregando ranking...
+        </div>
+        
+        <div class="error" ng-if="error">
+            Ocorreu um erro ao carregar o ranking. Por favor, tente novamente.
+        </div>
+
+        <div class="ranking-list" ng-if="!loading && !error">
+            <div class="ranking-item" ng-repeat="player in leaderboard">
+                <img class="player-avatar" ng-src="{{player.image}}" alt="{{player.name}}">
+                <div class="player-info">
+                    <span class="player-name">{{player.name}}</span>
+                    <span class="player-points">{{player.total | number}} pontos</span>
+                </div>
+                <span class="ranking-position position-{{player.position}}">{{player.position}}</span>
+            </div>
+        </div>
+
+        <div class="navbar">
+            <div class="nav-item" ng-class="{'active': currentPage === 'status.html'}" ng-click="navigateTo('status.html')">
+                <span class="nav-icon">📊</span>
+                Status
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'challenges.html'}" ng-click="navigateTo('challenges.html')">
+                <span class="nav-icon">🎯</span>
+                Desafios
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'leaderboard.html'}" ng-click="navigateTo('leaderboard.html')">
+                <span class="nav-icon">🏆</span>
+                Ranking
+            </div>
+            <div class="nav-item" ng-class="{'active': currentPage === 'prizes.html'}" ng-click="navigateTo('prizes.html')">
+                <span class="nav-icon">🎁</span>
+                Prêmios
+            </div>
+        </div>
+    </div>
+
+    <script>
+        angular.module('literalCafeApp', [])
+            .controller('RankingController', ['$scope', '$http', function($scope, $http) {
+                $scope.leaderboard = [];
+                $scope.loading = true;
+                $scope.error = false;
+                
+                // Define a página atual com base no caminho do URL
+                $scope.currentPage = window.location.pathname.split('/').pop();
+
+                // Função para navegação
+                $scope.navigateTo = function(page) {
+                    window.location.href = page;
+                };
+
+                var req = {
+                    method: 'POST',
+                    url: 'https://service2.funifier.com/v3/leaderboard/ESZsmkK/leader/aggregate?period=&live=true',
+                    headers: {
+                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiIsImNhbGciOiJHWklQIn0.H4sIAAAAAAAAAD2LQQrCMBAAvyI559AkdTd4FwSPPkDWdAOBYEOSqkX8uwuF3oZh5quopCuv6qTADzYaG6yzGHGMjhwIeaVVC3NhSSrTdKec9eFdU-cNJ868M3V6UGN5KIR5eXa5zrf1El5V3NK47mIWkUgCg-NxQOsNaMWfsglABAO_P8SvQ8WgAAAA.l6Irs0s6D4bDlyL9k3iGgDvIntXRWRKPe9F-swp42zml7PppRkr6lma1y3yQbLYFSKNtUMGTCjK5_pDybXcemA", 
+                        "Content-Type": "application/json"
+                    },
+                    data: []
+                };
+
+                // Carrega os dados da API real
+                $http(req).then(
+                    function(response) {
+                        $scope.leaderboard = response.data;
+                        $scope.loading = false;
+                    },
+                    function(error) {
+                        console.log('Erro ao carregar o ranking:', error);
+                        $scope.error = true;
+                        $scope.loading = false;
+                    }
+                );
+            }]);
+    </script>
+</body>
+</html>
